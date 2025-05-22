@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    volumes:
+      - ../..:/workspaces:cached
+      - /central-backend:/workspace/central-backend
+      - /central-frontend:/workspace/central-frontend
+      - /enketo:/workspace/enketo
+    command: sleep infinity
+    network_mode: service:db
+
+  db:
+    container_name: odk-postgres14
+    image: postgres:latest
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: jubilant
+      POSTGRES_USER: jubilant
+      POSTGRES_DB: jubilant
+
+  redis:
+    image: redis:latest
+    network_mode: service:db
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+volumes:
+  postgres-data:
